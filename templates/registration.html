@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ユーザー登録</title>
+</head>
+<body>
+    <h1>ユーザー登録</h1>
+    <form method="post" action="{{ url_for('main.register') }}">
+        {{ form.csrf_token }}
+        <label for="new_username">ユーザー名：</label>
+        {{ form.new_username(size=20, required=True) }}
+        <br>
+        <label for="new_password">パスワード：</label>
+        {{ form.new_password(size=20, required=True) }}
+        <br>
+        <input type="submit" value="登録">
+    </form>
+</body>
+</html>

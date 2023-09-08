@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+   
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1>Food List</h1>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Protein per 100g</th>
+            <th>Carbs per 100g</th>
+            <th>Fat per 100g</th>
+            <!-- 他のカラムもここに追加します -->
+          </tr>
+        </thead>
+        <tbody>
+          {% for food in foods %}
+          <tr>
+            <td>{{ food.id }}</td>
+            <td>{{ food.name }}</td>
+            <td>{{ food.protein_per_100g }}</td>
+            <td>{{ food.carbs_per_100g }}</td>
+            <td>{{ food.fat_per_100g }}</td>
+            <!-- 他のカラムのデータもここに追加します -->
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>栄養アプリへようこそ</title>
+</head>
+<body>
+    <h1>栄養アプリへようこそ</h1>
+
+<!--POSTメソッドでlogin_pageというエンドポイントにデータを送信-->
+
+<form method="post"  action="{{ url_for('main.login_page') }}">
+
+    {{ login_form.csrf_token }}
+    <label for="username">ユーザ名:</label>
+    {{ login_form.username(size=20, required=True) }} <!--required=Trueがあるとユーザーが値を入力しないとフォームが送信できなくさせられる-->
+    <br>
+    <label for="password">パスワード:</label>
+    {{ login_form.password(size=20, required=True) }}
+    <br>
+    <input type="submit" name="submit_login" value="ログイン"> <!--submitはフォームの送信アクションを表す要素-->
+</form>
+
+<!-- RegistrationForm のフィールド表示部分 -->
+<form method="post" action="{{ url_for('main.login_page') }}">
+
+
+    {{ register_form.csrf_token }}
+    <label for="new_username">新しいユーザー名：</label>
+    {{ register_form.new_username(size=20, required=True) }}
+    <br>
+    <label for="new_password">新しいパスワード：</label>
+    {{ register_form.new_password(size=20, required=True) }}
+    <br>
+    <input type="submit" name="submit_register" value="登録">
+</form>
+
+
+
+    
+   
+</body>
+</html>
+

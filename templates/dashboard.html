@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ダッシュボード</title>
+</head>
+<body>
+
+    <h2>その日の摂取した栄養素</h2>
+   
+    <ul>
+
+    <li>エネルギー (kcal): {{ nutrients_data.Energy_kcal }}kcal</li>
+    <li>タンパク質: {{ nutrients_data.Protein }} g</li>
+    <li>脂質: {{ nutrients_data.Fat }} g</li>
+    <li>コレステロール: {{ nutrients_data.Cholesterol }} mg</li>
+    <li>炭水化物: {{ nutrients_data.Carbohydrates }} g</li>
+
+    </ul>
+
+
+
+    <div class="food-entry-form">
+        <h2>Add Food Entry</h2>
+        <form method="POST" action="/dashboard">
+            <div class="form-group">
+                {{ form.date.label(class="form-control-label")}}
+                {{form.date(class="form-control",placeholder="Select Date")}}
+            </div>
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.name.label }}
+                {{ form.name(class="form-control") }} 
+            </div>
+            <div class="form-group">
+                {{ form.grams.label }} {{ form.grams(size=5) }}
+            </div>
+            <div class="form-group">
+                {{ form.submit_entry() }}
+
+            </div>
+        </form>
+    </div>
+
+    
+
+    {% for entry in entries %}
+    <div class="entry">
+        <h3>{{ entry.date }}</h3>
+        <ul>
+        {% for food in entry.foods %}
+            <li>
+                {{ food.food_name }} - {{ food.grams }} g
+                <form method="POST" action="/edit_food/{{ food.id }}">
+                    <button type="submit">修正</button>
+                </form>
+                <form method="POST" action="/delete_food/{{ food.id }}">
+                    <button type="submit">削除</button>
+                </form>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endfor %}
+
+
+
+
+
+    <h2>履歴</h2>
+    {% for entry in entries %}
+        <div class="entry">
+            <h3>{{ entry.date }}</h3>
+            <p>エネルギー (kcal): <span>{{ entry.kcal }}</span></p>
+            <p>タンパク質: <span>{{ entry.protein }}</span></p>
+            <p>脂質: <span>{{ entry.fat }}</span></p>
+            <p>コレステロール: <span>{{ entry.cholesterol }}</span></p>
+            <p>炭水化物: <span>{{ entry.carbs }}</span></p>
+            <ul>
+            {% for food in entry.foods %}
+                <li>{{ food.food_name }} - {{ food.grams }} g</li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+
+
+</body>
+</html>
