@@ -1,9 +1,11 @@
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, redirect, url_for, request,flash
 from flask_login import login_user, current_user
-from forms import LoginForm, RegistrationForm, FoodEntryForm
-from models import User, FoodEntry, Food, DailyNutrient, db
+from forms import LoginForm, RegistrationForm, FoodEntryForm,EditGramsForm
+from models import User, FoodEntry, Food, DailyNutrient, db,get_food_by_name, create_new_food_entry
 from utils import get_available_foods
+from models import create_new_food_entry
+
 
 
 main_blueprint = Blueprint('main', __name__)
@@ -135,26 +137,6 @@ def handle_form_submission(form):
     return {"error": "Food not found in the database"}
 
 
-def create_new_food_entry(food, food_name, grams, user_id, selected_date):
-    """新しい食品エントリの作成と追加"""
-    protein = (food.protein_per_100g / 100) * grams
-    carbohydrates = (food.carbs_per_100g / 100) * grams
-    fat = (food.fat_per_100g / 100) * grams
-    cholesterol = (food.cholesterol_per_100g / 100) * grams
-    energy_kcal = (food.energy_kcal_per_100g / 100) * grams
-
-    return FoodEntry(
-        user_id=user_id,
-        food_name=food_name,
-        grams=grams,
-        protein=protein,
-        fat=fat,
-        cholesterol=cholesterol,
-        carbohydrates=carbohydrates,
-        energy_kcal=energy_kcal,
-        date=selected_date
-    )
-
 
 def get_nutrients_data_today(today):
     """今日の栄養データの計算"""
@@ -163,6 +145,7 @@ def get_nutrients_data_today(today):
         FoodEntry.date.between(today, end_of_today)
     ).all()
     return compute_nutrients(today_entries)
+
 
 
 def update_daily_nutrient(user_id, nutrients_data_today,selected_date):
@@ -267,40 +250,37 @@ def group_entries_by_date(all_entries):
         })
     return entries
 
-def modify_food_entry(entry_id, new_data):
-    """既存の食品エントリを修正する
+@main_blueprint.route('/edit_food/<int:id>', methods=['GET', 'POST'])
+def edit_food(id):
+    entry = FoodEntry.query.get(id)
+    form = EditGramsForm()
+    print("Entry:", entry)
 
-    Args:
-    entry_id (int): 修正するエントリのID
-    new_data (dict): 新しいデータの辞書（food_name, grams, date等）
-
-    Returns:
-    dict: 更新された栄養データ
-    """
-    entry = FoodEntry.query.get(entry_id)
-    if entry:
-        for key, value in new_data.items():
-            setattr(entry, key, value)
-        db.session.commit()
-        return compute_nutrients([entry])
+    if request.method == 'POST':
+        new_grams = request.form.get('grams')
+        if new_grams:
+            entry.grams = new_grams
+            db.session.commit()
+            return redirect(url_for('main.dashboard'))
+        else:
+            error_message = "新しいグラム数を入力してください"
     else:
-        return {"error": "Entry not found"}
+        error_message = ""
 
-def delete_food_entry(entry_id):
-    """食品エントリを削除する
+    print("Entry object before render_template:", entry)
+    return render_template('edit_food.html', entry=entry, error_message=error_message, form=form)
 
-    Args:
-    entry_id (int): 削除するエントリのID
 
-    Returns:
-    dict: 状態メッセージ
-    """
-    entry = FoodEntry.query.get(entry_id)
+@main_blueprint.route('/delete_food/<int:id>', methods=['POST'])
+def delete_food(id):
+    entry = FoodEntry.query.get(id)
     if entry:
         db.session.delete(entry)
         db.session.commit()
-        return {"success": "Entry deleted successfully"}
+        flash('エントリが正常に削除されました', 'success')
     else:
-        return {"error": "Entry not found"}
+        flash('エントリが見つかりません', 'error')
+    return redirect(url_for('main.dashboard'))
+
 
 

@@ -3,6 +3,9 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
+from extensions import db
+
+
 
 db = SQLAlchemy()
 
@@ -114,3 +117,51 @@ class DailyNutrient(db.Model):
     updated_at = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     is_deleted = db.Column(db.Boolean, default=False)
+
+
+def get_food_by_name(food_name):
+    """名前を使って食品情報を取得する"""
+
+    food = Food.query.filter_by(name=food_name).first()
+    print(f"Food info for {food_name}: {food}")
+
+    if food:
+        return food
+    else:
+        return None
+    
+def create_new_food_entry(food, food_name, grams, user_id, selected_date):
+    """新しい食品エントリの作成と追加"""
+
+    food = get_food_by_name(food_name) # この関数はfoodオブジェクトを取得するための実際の関数名であるべきです
+
+    if not food or food.protein_per_100g is None:
+        # ここでエラーハンドリングを行います（ログの記録、例外の送出、適当なデフォルト値の設定など）
+        print(f"Error: food not found or protein_per_100g is None for food name {food_name}")
+        return
+      
+    protein = (food.protein_per_100g / 100) * grams
+    carbohydrates = (food.carbs_per_100g / 100) * grams
+    fat = (food.fat_per_100g / 100) * grams
+    cholesterol = (food.cholesterol_per_100g / 100) * grams
+    energy_kcal = (food.energy_kcal_100g / 100) * grams
+
+
+    print(f"Calculated nutrients: Protein={protein}, Carbohydrates={carbohydrates}, Fat={fat}, Cholesterol={cholesterol}, Energy_kcal={energy_kcal}")
+
+
+
+
+    return FoodEntry(
+        user_id=user_id,
+        food_name=food_name,
+        grams=grams,
+        protein=protein,
+        fat=fat,
+        cholesterol=cholesterol,
+        carbohydrates=carbohydrates,
+        energy_kcal=energy_kcal,
+        date=selected_date
+    )
+
+

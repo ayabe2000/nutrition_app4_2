@@ -29,3 +29,8 @@ class FoodEntryForm(FlaskForm):
     name = SelectField('Select Food', choices=[])
     grams = IntegerField('Grams', validators=[NumberRange(min=1)])
     submit_entry = SubmitField('Submit')
+
+
+class EditGramsForm(FlaskForm):
+    grams = IntegerField('新しいグラム数:', validators=[DataRequired(message="新しいグラム数を入力してください")])
+    submit = SubmitField('更新')

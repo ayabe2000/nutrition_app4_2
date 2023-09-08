@@ -5,6 +5,8 @@ from flask_login import LoginManager
 from config import SECRET_KEY, SQLALCHEMY_DATABASE_URI
 from models import db
 from views import main_blueprint
+from extensions import app, db
+
 
 
 login_manager = LoginManager()
@@ -31,10 +33,11 @@ def create_app():
     app.register_blueprint(main_blueprint)
       
     return app
+from models import db, User
+
 
 @login_manager.user_loader
 def load_user(user_id):
-    from models import User
     return User.query.get(int(user_id))
 
 app = create_app() 
