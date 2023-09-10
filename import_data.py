@@ -5,7 +5,8 @@ import logging
 from app import db, create_app
 from models import Food
 
-logging.basicConfig(filename='import_food.log', level=logging.INFO)
+logging.basicConfig(filename="import_food.log", level=logging.INFO)
+
 
 def convert_to_float(value):
     """
@@ -20,7 +21,7 @@ def convert_to_float(value):
     try:
         if isinstance(value, (int, float)):
             return float(value)
-        return float(value.replace(',', ''))
+        return float(value.replace(",", ""))
     except ValueError:
         return 0.0
 
@@ -28,26 +29,26 @@ def convert_to_float(value):
 def process_row(row):
     """Excelのデータを処理するコード"""
     # 食品名
-    food_name = row['食品名']
+    food_name = row["食品名"]
     # エネルギー（kcal）
-    energy_val = convert_to_float(row['エネルギー（kcal）'])
+    energy_val = convert_to_float(row["エネルギー（kcal）"])
     # たんぱく質
-    protein_val = convert_to_float(row['たんぱく質'])
+    protein_val = convert_to_float(row["たんぱく質"])
     # 脂質
-    fat_val = convert_to_float(row['脂質'])
+    fat_val = convert_to_float(row["脂質"])
     # コレステロール
-    cholesterol_val = convert_to_float(row['コレステロール'])
+    cholesterol_val = convert_to_float(row["コレステロール"])
     # 炭水化物
-    carbohydrates_val = convert_to_float(row['炭水化物'])
+    carbohydrates_val = convert_to_float(row["炭水化物"])
 
     if not Food.query.filter_by(name=food_name).first():
         new_food = Food(
             name=food_name,
             protein_per_100g=protein_val,
             carbs_per_100g=carbohydrates_val,
-            fat_per_100g=fat_val, 
-            cholesterol_per_100g=cholesterol_val, 
-            energy_kcal_100g=energy_val  
+            fat_per_100g=fat_val,
+            cholesterol_per_100g=cholesterol_val,
+            energy_kcal_100g=energy_val,
         )
         db.session.add(new_food)
         db.session.commit()
@@ -79,21 +80,21 @@ def import_food_data_from_excel(excel_path):
                     process_row(row)
                 except pd.errors.ParserError as parser_error:
                     logging.error(
-                        f"An error occurred while processing the data: {parser_error}")  # 2. ログを出力
+                        f"An error occurred while processing the data: {parser_error}"
+                    )
                 except KeyError as key_error:
                     logging.error(f"Error at row {index + 1}: {key_error}")  # 2. ログを出力
                     error_rows.append(index + 1)
 
             db.session.commit()
-        
 
         except ValueError as value_error:
-            logging.error(f"An error occurred while reading the Excel data: {value_error}")  # 2. ログを出力
+            logging.error(
+                f"An error occurred while reading the Excel data: {value_error}"
+            )
 
 
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app_instance = create_app()
     with app_instance.app_context():
         import_food_data_from_excel("/mnt/c/Users/user/Downloads/food_data.xlsx")

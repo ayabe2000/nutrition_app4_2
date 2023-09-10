@@ -1,3 +1,6 @@
+"""特定の食品のリストを返す"""
+
+
 def get_available_foods():
     available_foods = [
         ("こむぎ"),
@@ -7,6 +10,6 @@ def get_available_foods():
         ("いも"),
         ("あずき"),
         ("オクラ"),
-        ("かぶ")
+        ("かぶ"),
     ]
     return available_foods
