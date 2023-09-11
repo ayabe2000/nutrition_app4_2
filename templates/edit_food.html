@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+    <body>
+        {% block content %}
+            <h1>食品エントリの編集</h1>
+            {% if error_message %}
+                <p style="color: red;">{{ error_message }}</p>
+            {% endif %}
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <label for="grams">新しいグラム数:</label>
+                {{ form.grams(size=32) }} <!-- Flask-WTF フォームフィールドを使用 -->
+                <button type="submit">更新</button>
+            </form>
+            <p><a href="{{ url_for('main.dashboard') }}">ダッシュボードに戻る</a></p>              
+        {% endblock %}
+
+    </body>
+

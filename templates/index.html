@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>栄養アプリ</title>
+</head>
+<body>
+    <h1>栄養アプリへようこそ</h1>
+    
+    {% if not current_user.is_authenticated %}
+        <p>ログインしてアプリを利用しましょう！</p>
+        <a href="{{ url_for('main.login_page') }}">ログイン</a> <!--もしユーザーが認証されていなければ、ログインリンク-->
+    {% else %}
+        <p>ダッシュボードへ移動します。</p>
+        <a href="{{ url_for('main.dashboard') }}">ダッシュボード</a><!--認証されていれば、ダッシュボードへ-->
+
+    </form>
+    {% endif %}
+</body>
+</html>
