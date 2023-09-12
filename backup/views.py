@@ -9,12 +9,11 @@ from models import (
     Food,
     DailyNutrient,
     db,
+    get_food_by_name,
     create_new_food_entry,
 )
 from utils import get_available_foods
 from models import create_new_food_entry
-from generate_graph import generate_graph
-
 
 
 main_blueprint = Blueprint("main", __name__)
@@ -82,14 +81,6 @@ def dashboard():
     if form.validate_on_submit() and current_user.is_authenticated:
         selected_date = form.date.data
         nutrients_data_today = handle_form_submission(form)
-
-        today = datetime.now().date()
-        nutrients_data_today = get_nutrients_data_today(today)
-
-        user_id =current_user.__id
-        update_daily_nutrient(user_id, nutrients_data_today,selected_date)
-
-        generate_graph(user_id, selected_date)
 
     all_entries = FoodEntry.query.order_by(FoodEntry.date.desc()).all()
     nutrients_data = compute_nutrients(all_entries)

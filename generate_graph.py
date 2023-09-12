@@ -1,14 +1,10 @@
 """データベースにデータを追加し、そのデータを取得してグラフ化し、そのグラフをHTMLファイルに埋め込む"""
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
+from flask import current_app as app
+
 import matplotlib.pyplot as plt
 import base64
-from datetime import datetime
-from app import db, create_app
-from models import Food
-
-
-app = create_app()
-app.app_context().push()
+from datetime import datetime, timedelta
 
 foods = [
     {
@@ -18,6 +14,7 @@ foods = [
         "fat_per_100g": 10.6,
         "cholesterol_per_100g": 1,
         "energy_kcal_100g": 337,
+        "date": "2023-09-12"
     },
     {
         "name": "食パン",
@@ -74,32 +71,40 @@ foods = [
         "fat_per_100g": 0.2,
         "cholesterol_per_100g": 1,
         "energy_kcal_100g": 30,
-    },
+    }
+
 ]
 
-for food in foods:
-    food_data = Food(
-        name=food["name"],
-        protein_per_100g=food["protein_per_100g"],
-        carbs_per_100g=food["carbs_per_100g"],
-        fat_per_100g=food["fat_per_100g"],
-        cholesterol_per_100g=food["cholesterol_per_100g"],
-        energy_kcal_100g=food["energy_kcal_100g"],
-        date=datetime.now().date(),
-    )
-    db.session.add(food_data)
 
-db.session.commit()
 
+def add_foods_to_db():
+    engine = create_engine("sqlite:////root/nutrition_app4/nutrition_app4.db")
+    connection = engine.connect()
+
+    for food in foods:
+        connection.execute(
+            text("""
+                INSERT INTO food (name,protein_per_100g, carbs_per_100g,cholesterol_per_100g,energy_kcal_100g,date)
+                 VALUES (:name, :protein_per_100g, :carbs_per_100g, :fat_per_100g, :cholesterol_per_100g, :energy_kcal_100g, :date)
+                 """),
+                 **food
+        )
+    connection.close()
 
 def fetch_data():
     """データベースから日付ごとの栄養素摂取量を取得"""
     engine = create_engine("sqlite:////root/nutrition_app4/nutrition_app4.db")
+    
 
+    connection = datetime.now()
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=9)
     connection = engine.connect()
     result = connection.execute(
-        "SELECT date, SUM(protein_per_100g) as protein, SUM(energy_kcal_100g) as energy, SUM(fat_per_100g) as fat, SUM(cholesterol_per_100g) as cholesterol, SUM(carbs_per_100g) as carbohydrates FROM food GROUP BY date"
+        text("SELECT date, SUM(protein_per_100g) as protein, SUM(energy_kcal_100g) as energy, SUM(fat_per_100g) as fat, SUM(cholesterol_per_100g) as cholesterol, SUM(carbs_per_100g) as carbohydrates FROM food WHERE date IS NOT NULL AND date BETWEEN :start_date AND :end_date GROUP BY date"),
+        {'start_date': start_date.strftime('%Y-%m-%d'), 'end_date': end_date.strftime('%Y-%m-%d')}
     )
+    
 
     dates = []
     protein = []
@@ -109,16 +114,29 @@ def fetch_data():
     carbohydrates = []
 
     for row in result:
-        dates.append(row["date"])
-        protein.append(row["protein"])
-        energy.append(row["energy"])
-        fat.append(row["fat"])
-        cholesterol.append(row["cholesterol"])
-        carbohydrates.append(row["carbohydrates"])
+
+        date_str = row[0]
+        if date_str:
+            dates.append(datetime.strptime(date_str, '%Y-%m-%d'))     
+        else:
+            dates.append(None)
+
+
+        protein.append(row[1])
+        energy.append(row[2])
+        fat.append(row[3])
+        cholesterol.append(row[4]) 
+        carbohydrates.append(row[5])  
 
     connection.close()
 
+
+
+
     return dates, protein, energy, fat, cholesterol, carbohydrates
+
+
+
 
 
 def generate_graph(dates, protein, energy, fat, cholesterol, carbohydrates):
@@ -138,6 +156,8 @@ def generate_graph(dates, protein, energy, fat, cholesterol, carbohydrates):
     plt.tight_layout()
 
     plt.savefig("nutrient_intake.png")
+
+    plt.show()
 
 
 def get_base64_encoded_image(image_path):
@@ -163,6 +183,7 @@ def create_html(encoded_image):
 # main関数
 def main():
     """fetch_data, generate_graph, get_base64_encoded_image,create_html関数を順番に呼び出し、プロセスを実行"""
+    add_foods_to_db()
     dates, protein, energy, fat, cholesterol, carbohydrates = fetch_data()
     generate_graph(dates, protein, energy, fat, cholesterol, carbohydrates)
 

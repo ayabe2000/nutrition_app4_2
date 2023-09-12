@@ -144,50 +144,28 @@ def get_nutrition_data(user_id, date):
 
 def create_new_food_entry(food, food_name, grams, user_id, selected_date):
     """新しい食品エントリの作成と追加"""
-   
-    food = get_food_by_name(food_name) 
+
+    food = get_food_by_name(food_name)  # この関数はfoodオブジェクトを取得するための実際の関数名であるべきです
 
     if not food or food.protein_per_100g is None:
         
         return
     
-    print(f"Protein per 100g: {food.protein_per_100g}")
-    print(f"Carbs per 100g: {food.carbs_per_100g}")
-    print(f"Fat per 100g: {food.fat_per_100g}")
-    print(f"Cholesterol per 100g: {food.cholesterol_per_100g}")
-    print(f"Energy per 100g: {food.energy_kcal_100g}")
-
-    
-    
-    protein_per_serving = (food.protein_per_100g * grams) / 100
-    carbs_per_serving = (food.carbs_per_100g * grams) / 100
-    fat_per_serving = (food.fat_per_100g * grams) / 100
-    cholesterol_per_serving = (food.cholesterol_per_100g * grams) / 100
-    energy_per_serving = (food.energy_kcal_100g * grams) / 100
-
-
-    print(f"Protein per serving: {protein_per_serving}")
-    print(f"Carbs per serving: {carbs_per_serving}")
-    print(f"Fat per serving: {fat_per_serving}")
-    print(f"Cholesterol per serving: {cholesterol_per_serving}")
-    print(f"Energy per serving: {energy_per_serving}")
-
+    protein = food.protein_per_100g * (grams / 100)
+    carbohydrates = food.carbs_per_100g * (grams / 100)
+    fat = food.fat_per_100g * (grams / 100)
+    cholesterol = food.cholesterol_per_100g * (grams / 100)
+    energy_kcal = food.energy_kcal_100g * (grams / 100)
 
 
     return FoodEntry(
         user_id=user_id,
         food_name=food_name,
         grams=grams,
-        protein=protein_per_serving, 
-        carbohydrates=carbs_per_serving, 
-        fat=fat_per_serving,
-        cholesterol=cholesterol_per_serving, 
-        energy_kcal=energy_per_serving, 
+        protein=protein,
+        fat=fat,
+        cholesterol=cholesterol,
+        carbohydrates=carbohydrates,
+        energy_kcal=energy_kcal,
         date=selected_date,
     )
-
-
-  
-
-
- 

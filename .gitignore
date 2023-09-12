@@ -1,4 +1,6 @@
 import_food.log
-venv/
 nutrition_app4_backup/
 config.py
+venv/
+__pycache__/
+
