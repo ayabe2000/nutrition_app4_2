@@ -4,3 +4,9 @@ config.py
 venv/
 __pycache__/
 
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+config.py

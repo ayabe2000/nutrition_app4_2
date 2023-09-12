@@ -147,10 +147,15 @@ def create_new_food_entry(food, food_name, grams, user_id, selected_date):
    
     food = get_food_by_name(food_name) 
 
+
+    food = get_food_by_name(food_name)  # この関数はfoodオブジェクトを取得するための実際の関数名であるべきです
+
+
     if not food or food.protein_per_100g is None:
         
         return
     
+
     print(f"Protein per 100g: {food.protein_per_100g}")
     print(f"Carbs per 100g: {food.carbs_per_100g}")
     print(f"Fat per 100g: {food.fat_per_100g}")
@@ -173,11 +178,19 @@ def create_new_food_entry(food, food_name, grams, user_id, selected_date):
     print(f"Energy per serving: {energy_per_serving}")
 
 
+    protein = food.protein_per_100g * (grams / 100)
+    carbohydrates = food.carbs_per_100g * (grams / 100)
+    fat = food.fat_per_100g * (grams / 100)
+    cholesterol = food.cholesterol_per_100g * (grams / 100)
+    energy_kcal = food.energy_kcal_100g * (grams / 100)
+
+
 
     return FoodEntry(
         user_id=user_id,
         food_name=food_name,
         grams=grams,
+
         protein=protein_per_serving, 
         carbohydrates=carbs_per_serving, 
         fat=fat_per_serving,
@@ -188,6 +201,4 @@ def create_new_food_entry(food, food_name, grams, user_id, selected_date):
 
 
   
-
-
- 
+     
